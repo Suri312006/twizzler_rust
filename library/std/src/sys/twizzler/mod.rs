@@ -128,12 +128,15 @@ pub unsafe extern "C" fn std_entry_from_runtime(
 
     crate::sys::os::init_environment(aux.env);
     let runtime = twizzler_runtime_api::get_runtime();
+    runtime.pre_main_hook();
+    let code = main(aux.argc as isize, aux.args);
+
     // If pre_main_hook returns a code, then don't call main and exit with that code instead.
-    let code = if let Some(pre_code) = runtime.pre_main_hook() {
-        pre_code
-    } else {
-        main(aux.argc as isize, aux.args)
-    };
+    //let code = if let Some(pre_code) = runtime.pre_main_hook() {
+    //    pre_code
+    //} else {
+    //    main(aux.argc as isize, aux.args)
+    //};
     runtime.post_main_hook();
 
     thread_local_dtor::run_dtors();
